@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "package": "me.Thelnfamous1.clone_army.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "clone_army.refmap.json",
+  "mixins": [
+    "BrainAccess",
+    "BrainMixin",
+    "MobMixin",
+    "StartAttackingMixin",
+    "StopAttackingIfTargetInvalidMixin",
+    "TargetingConditionsMixin"
+  ],
+  "client": [],
+  "minVersion": "0.8.5"
+}

@@ -1,0 +1,13 @@
+{
+  "commands.clone_army.mobcombat.success": "%ss will now target %ss",
+  "commands.clone_army.mobcombat.clear.success": "%ss will no longer target specific mobs",
+  "commands.clone_army.mobcombat.clearall.success": "All mobs will no longer target specific mobs",
+  "commands.clone_army.targetplayer.success": "%ss will now target player %s",
+  "commands.clone_army.targetplayer.clear.success": "%ss will no longer target a specific player",
+  "commands.clone_army.targetplayer.clearall.success": "All mobs will no longer target specific players",
+  "commands.clone_army.toggleremote.not_holding_remote": "You need to be holding a clone remote",
+  "commands.clone_army.togglehostility.success": "Toggled %s hostility to %s",
+  "commands.clone_army.toggleremote.success": "Toggled %s to %s",
+  "item.clone_army.clone_remote": "Clone Remote",
+  "item.clone_army.clone_remote.entity_type": "Clone: %s"
+}
