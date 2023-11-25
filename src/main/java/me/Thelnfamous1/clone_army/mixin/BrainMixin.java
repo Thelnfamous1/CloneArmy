@@ -1,6 +1,6 @@
 package me.Thelnfamous1.clone_army.mixin;
 
-import me.Thelnfamous1.clone_army.CloneArmy;
+import me.Thelnfamous1.clone_army.CommandableCombat;
 import me.Thelnfamous1.clone_army.duck.EntityHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.Brain;
@@ -26,11 +26,9 @@ public abstract class BrainMixin implements EntityHolder {
 
     @Shadow protected abstract void setActiveActivity(Activity pActivity);
 
-    @Shadow public abstract void setActiveActivityIfPossible(Activity pActivity);
-
     @Inject(method = "updateActivityFromSchedule", at = @At("HEAD"), cancellable = true)
     private void handleFightActivity(long pDayTime, long pGameTime, CallbackInfo ci){
-        if(this.heldEntity != null && CloneArmy.hasCustomAttackTarget(this.heldEntity)){
+        if(this.heldEntity != null && CommandableCombat.hasCommandedAttackTarget(this.heldEntity)){
             if (this.activityRequirementsAreMet(Activity.FIGHT)) {
                 ci.cancel();
                 this.setActiveActivity(Activity.FIGHT);
@@ -40,7 +38,7 @@ public abstract class BrainMixin implements EntityHolder {
 
     @Inject(method = "setActiveActivityIfPossible", at = @At("HEAD"), cancellable = true)
     private void handleFightActivity(Activity pActivity, CallbackInfo ci){
-        if(this.heldEntity != null && pActivity != Activity.FIGHT && CloneArmy.hasCustomAttackTarget(this.heldEntity)){
+        if(this.heldEntity != null && pActivity != Activity.FIGHT && CommandableCombat.hasCommandedAttackTarget(this.heldEntity)){
             if (this.activityRequirementsAreMet(Activity.FIGHT)) {
                 ci.cancel();
                 this.setActiveActivity(Activity.FIGHT);
@@ -50,7 +48,7 @@ public abstract class BrainMixin implements EntityHolder {
 
     @Inject(method = "setActiveActivityToFirstValid", at = @At("HEAD"), cancellable = true)
     private void handleFightActivity(List<Activity> pActivities, CallbackInfo ci){
-        if(this.heldEntity != null && !pActivities.contains(Activity.FIGHT) && CloneArmy.hasCustomAttackTarget(this.heldEntity)){
+        if(this.heldEntity != null && !pActivities.contains(Activity.FIGHT) && CommandableCombat.hasCommandedAttackTarget(this.heldEntity)){
             if (this.activityRequirementsAreMet(Activity.FIGHT)) {
                 ci.cancel();
                 this.setActiveActivity(Activity.FIGHT);

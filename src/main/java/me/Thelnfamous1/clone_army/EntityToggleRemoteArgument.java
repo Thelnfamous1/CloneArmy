@@ -15,9 +15,7 @@ import java.util.Collection;
 
 public class EntityToggleRemoteArgument implements ArgumentType<ResourceLocation> {
    private static final Collection<String> EXAMPLES = Arrays.asList("minecraft:pig", "cow");
-   public static final DynamicCommandExceptionType ERROR_UNKNOWN_ENTITY = new DynamicCommandExceptionType((o) -> {
-      return Component.translatable("entity.notFound", o);
-   });
+   public static final DynamicCommandExceptionType ERROR_UNKNOWN_ENTITY = new DynamicCommandExceptionType((o) -> Component.translatable("entity.notFound", o));
 
    public static EntityToggleRemoteArgument id() {
       return new EntityToggleRemoteArgument();
@@ -28,7 +26,7 @@ public class EntityToggleRemoteArgument implements ArgumentType<ResourceLocation
    }
 
    private static ResourceLocation verifyCanSummon(ResourceLocation pId) throws CommandSyntaxException {
-      Registry.ENTITY_TYPE.getOptional(pId).filter(CloneArmy::isCloneType).orElseThrow(() -> ERROR_UNKNOWN_ENTITY.create(pId));
+      Registry.ENTITY_TYPE.getOptional(pId).filter(CloneArmy::isBeenType).orElseThrow(() -> ERROR_UNKNOWN_ENTITY.create(pId));
       return pId;
    }
 

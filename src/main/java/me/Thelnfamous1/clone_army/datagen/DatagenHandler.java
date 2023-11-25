@@ -27,6 +27,7 @@ public class DatagenHandler {
                 this.add(CACommands.NOT_HOLDING_REMOTE_EXCEPTION_KEY, "You need to be holding a clone remote");
                 this.add(CACommands.TOGGLE_REMOTE_SUCCESS_KEY, "Toggled %s to %s");
                 this.add(CACommands.TOGGLE_HOSTILITY_SUCCESS_KEY, "Toggled %s hostility to %s");
+                this.add(CACommands.TOGGLE_HOSTILITY_CLEAR_SUCCESS_KEY, "%ss no longer have a hostility toggle");
                 this.add(CACommands.TARGET_PLAYER_SUCCESS_KEY, "%ss will now target player %s");
                 this.add(CACommands.TARGET_PLAYER_CLEAR_SUCCESS_KEY, "%ss will no longer target a specific player");
                 this.add(CACommands.TARGET_PLAYER_CLEAR_ALL_SUCCESS_KEY, "All mobs will no longer target specific players");

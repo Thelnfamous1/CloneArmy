@@ -1,6 +1,6 @@
 package me.Thelnfamous1.clone_army.mixin;
 
-import me.Thelnfamous1.clone_army.CloneArmy;
+import me.Thelnfamous1.clone_army.CommandableCombat;
 import me.Thelnfamous1.clone_army.duck.Summonable;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -23,13 +23,12 @@ public class TargetingConditionsMixin {
             if(!this.isCombat) return;
 
 
-            if(!CloneArmy.isHostile(mobAttacker.getType())){
+            if(CommandableCombat.isAlwaysPassive(mobAttacker.getType())){
                 cir.setReturnValue(false);
                 return;
             }
 
-            if(CloneArmy.hasPlayerTarget(mobAttacker) && !CloneArmy.isPlayerTarget(mobAttacker, pTarget)
-                    || CloneArmy.hasMobCombat(mobAttacker) && !CloneArmy.isMobCombat(mobAttacker, pTarget)){
+            if(!CommandableCombat.isAllowedToAttack(mobAttacker, pTarget, true)){
                 cir.setReturnValue(false);
                 return;
             }

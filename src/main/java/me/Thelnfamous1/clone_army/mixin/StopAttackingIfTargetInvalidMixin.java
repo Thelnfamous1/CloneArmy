@@ -1,6 +1,6 @@
 package me.Thelnfamous1.clone_army.mixin;
 
-import me.Thelnfamous1.clone_army.CloneArmy;
+import me.Thelnfamous1.clone_army.CommandableCombat;
 import me.Thelnfamous1.clone_army.duck.Summonable;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
@@ -20,16 +20,18 @@ public abstract class StopAttackingIfTargetInvalidMixin<E extends Mob> {
     @Shadow protected abstract void clearAttackTarget(E pMemoryHolder);
 
     @Inject(method = "start(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/Mob;J)V", at = @At("HEAD"), cancellable = true)
-    private void forceTargetErasureIfNotHostile(ServerLevel pLevel, E pEntity, long pGameTime, CallbackInfo ci){
-        if(!CloneArmy.isHostile(pEntity.getType())){
+    private void forceTargetErasure(ServerLevel pLevel, E pEntity, long pGameTime, CallbackInfo ci){
+        if(CommandableCombat.isAlwaysPassive(pEntity.getType())){
             this.clearAttackTarget(pEntity);
             ci.cancel();
+            return;
         }
 
         LivingEntity attackTarget = this.getAttackTarget(pEntity);
         if (!Summonable.cast(pEntity).canSummonableAttack(attackTarget)) {
             this.clearAttackTarget(pEntity);
             ci.cancel();
+            return;
         }
 
         if (Summonable.cast(pEntity).isSummonableAlliedTo(attackTarget).orElse(false)) {
@@ -43,7 +45,7 @@ public abstract class StopAttackingIfTargetInvalidMixin<E extends Mob> {
     cancellable = true)
     private void preventTargetErasureByPredicate(ServerLevel pLevel, E pEntity, long pGameTime, CallbackInfo ci){
         LivingEntity attackTarget = this.getAttackTarget(pEntity);
-        if(CloneArmy.isPlayerTarget(pEntity, attackTarget) || CloneArmy.isMobCombat(pEntity, attackTarget)){
+        if(CommandableCombat.isAllowedToAttack(pEntity, attackTarget, false)){
             ci.cancel();
         }
     }

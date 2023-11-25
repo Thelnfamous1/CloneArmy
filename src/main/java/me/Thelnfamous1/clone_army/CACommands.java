@@ -26,6 +26,8 @@ public class CACommands {
 
     public static final String TOGGLE_HOSTILITY_SUCCESS_KEY = "commands.clone_army.togglehostility.success";
 
+    public static final String TOGGLE_HOSTILITY_CLEAR_SUCCESS_KEY = "commands.clone_army.togglehostility.clear.success";
+
     public static final String TARGET_PLAYER_SUCCESS_KEY = "commands.clone_army.targetplayer.success";
 
     public static final String TARGET_PLAYER_CLEAR_SUCCESS_KEY = "commands.clone_army.targetplayer.clear.success";
@@ -42,7 +44,7 @@ public class CACommands {
     public static void registerSuggestionProviders() {
         SUMMONABLE_CLONES = registerSuggestionProvider("summonable_entities", (ctx, builder) ->
                 SharedSuggestionProvider.suggestResource(
-                        Registry.ENTITY_TYPE.stream().filter(CloneArmy::isCloneType),
+                        Registry.ENTITY_TYPE.stream().filter(CloneArmy::isBeenType),
                         builder,
                         EntityType::getKey,
                         (type) -> Component.translatable(Util.makeDescriptionId("entity", EntityType.getKey(type)))));
@@ -89,12 +91,20 @@ public class CACommands {
                 .then(Commands.argument("entity", EntitySummonArgument.id())
                         .suggests(SuggestionProviders.SUMMONABLE_ENTITIES)
                         .then(Commands.argument("toggle", BoolArgumentType.bool())
-                                .executes((context) -> toggleHostility(context.getSource(), EntitySummonArgument.getSummonableEntity(context, "entity"), BoolArgumentType.getBool(context, "toggle"))))));
+                                .executes((context) -> toggleHostility(context.getSource(), EntitySummonArgument.getSummonableEntity(context, "entity"), BoolArgumentType.getBool(context, "toggle"))))
+                        .then(Commands.literal("clear")
+                                .executes((context) -> clearHostility(context.getSource(), EntitySummonArgument.getSummonableEntity(context, "entity"))))));
     }
 
     private static int toggleHostility(CommandSourceStack pSource, ResourceLocation pType, boolean toggle) {
-        EntityType.byString(pType.toString()).ifPresent(et -> CloneArmy.setHostile(et, toggle));
+        EntityType.byString(pType.toString()).ifPresent(et -> CommandableCombat.setHostilityToggle(et, toggle));
         pSource.sendSuccess(Component.translatable(TOGGLE_HOSTILITY_SUCCESS_KEY, Component.translatable(Util.makeDescriptionId("entity", pType)), toggle), true);
+        return 1;
+    }
+
+    private static int clearHostility(CommandSourceStack pSource, ResourceLocation pType) {
+        EntityType.byString(pType.toString()).ifPresent(CommandableCombat::clearHostilityToggle);
+        pSource.sendSuccess(Component.translatable(TOGGLE_HOSTILITY_CLEAR_SUCCESS_KEY, Component.translatable(Util.makeDescriptionId("entity", pType))), true);
         return 1;
     }
 
@@ -114,19 +124,19 @@ public class CACommands {
     }
 
     private static int targetPlayer(CommandSourceStack pSource, ResourceLocation pType, ServerPlayer player) {
-        EntityType.byString(pType.toString()).ifPresent(et -> CloneArmy.setPlayerTarget(et, player.getUUID()));
+        EntityType.byString(pType.toString()).ifPresent(et -> CommandableCombat.setPlayerTarget(et, player.getUUID()));
         pSource.sendSuccess(Component.translatable(TARGET_PLAYER_SUCCESS_KEY, Component.translatable(Util.makeDescriptionId("entity", pType)), player.getDisplayName()), true);
         return 1;
     }
 
     private static int clearAllPlayerTargets(CommandSourceStack pSource) {
-        CloneArmy.clearPlayerTargets();
+        CommandableCombat.clearAllPlayerTargets();
         pSource.sendSuccess(Component.translatable(TARGET_PLAYER_CLEAR_ALL_SUCCESS_KEY), true);
         return 1;
     }
 
     private static int clearTargetPlayer(CommandSourceStack pSource, ResourceLocation pType) {
-        EntityType.byString(pType.toString()).ifPresent(CloneArmy::removePlayerTarget);
+        EntityType.byString(pType.toString()).ifPresent(CommandableCombat::clearPlayerTarget);
         pSource.sendSuccess(Component.translatable(TARGET_PLAYER_CLEAR_SUCCESS_KEY, Component.translatable(Util.makeDescriptionId("entity", pType))), true);
         return 1;
     }
@@ -150,19 +160,19 @@ public class CACommands {
     private static int mobCombat(CommandSourceStack pSource, ResourceLocation attacker, ResourceLocation target) {
         EntityType.byString(attacker.toString())
                 .ifPresent(attackerType -> EntityType.byString(target.toString())
-                        .ifPresent(targetType -> CloneArmy.setMobCombat(attackerType, targetType)));
+                        .ifPresent(targetType -> CommandableCombat.setMobCombat(attackerType, targetType)));
         pSource.sendSuccess(Component.translatable(MOB_COMBAT_SUCCESS_KEY, Component.translatable(Util.makeDescriptionId("entity", attacker)), Component.translatable(Util.makeDescriptionId("entity", target))), true);
         return 1;
     }
 
     private static int clearAllMobCombat(CommandSourceStack pSource) {
-        CloneArmy.clearMobCombat();
+        CommandableCombat.clearMobCombat();
         pSource.sendSuccess(Component.translatable(MOB_COMBAT_CLEAR_ALL_SUCCESS_KEY), true);
         return 1;
     }
 
     private static int clearMobCombat(CommandSourceStack pSource, ResourceLocation pType) {
-        EntityType.byString(pType.toString()).ifPresent(CloneArmy::removeMobCombat);
+        EntityType.byString(pType.toString()).ifPresent(CommandableCombat::clearMobCombat);
         pSource.sendSuccess(Component.translatable(MOB_COMBAT_CLEAR_SUCCESS_KEY, Component.translatable(Util.makeDescriptionId("entity", pType))), true);
         return 1;
     }

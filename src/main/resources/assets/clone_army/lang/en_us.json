@@ -7,6 +7,7 @@
   "commands.clone_army.targetplayer.clearall.success": "All mobs will no longer target specific players",
   "commands.clone_army.toggleremote.not_holding_remote": "You need to be holding a clone remote",
   "commands.clone_army.togglehostility.success": "Toggled %s hostility to %s",
+  "commands.clone_army.togglehostility.clear.success": "%ss no longer have a hostility toggle",
   "commands.clone_army.toggleremote.success": "Toggled %s to %s",
   "item.clone_army.clone_remote": "Clone Remote",
   "item.clone_army.clone_remote.entity_type": "Clone: %s"
