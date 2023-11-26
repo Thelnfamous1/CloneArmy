@@ -4,15 +4,14 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mojang.datafixers.util.Pair;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.Brain;
-import net.minecraft.world.entity.ai.behavior.Behavior;
-import net.minecraft.world.entity.ai.behavior.MeleeAttack;
-import net.minecraft.world.entity.ai.behavior.SetWalkTargetFromAttackTargetIfTargetOutOfReach;
-import net.minecraft.world.entity.ai.behavior.StopAttackingIfTargetInvalid;
+import net.minecraft.world.entity.ai.behavior.*;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.MemoryStatus;
 import net.minecraft.world.entity.schedule.Activity;
+import net.minecraft.world.entity.schedule.Schedule;
 
 import java.util.Map;
 import java.util.Optional;
@@ -24,7 +23,18 @@ public class BrainHelper {
         typedBrain.getMemories().putIfAbsent(MemoryModuleType.ATTACK_TARGET, Optional.empty());
         typedBrain.getMemories().putIfAbsent(MemoryModuleType.ATTACK_COOLING_DOWN, Optional.empty());
         typedBrain.addActivityAndRemoveMemoryWhenStopped(Activity.FIGHT, pPriorityStart,
-                ImmutableList.of(new SetWalkTargetFromAttackTargetIfTargetOutOfReach(1.0F), new MeleeAttack(20), new StopAttackingIfTargetInvalid<>()), MemoryModuleType.ATTACK_TARGET);
+                ImmutableList.of(
+                        new SetWalkTargetFromAttackTargetIfTargetOutOfReach(1.0F),
+                        new MeleeAttack(20),
+                        new StopAttackingIfTargetInvalid<>(BrainHelper::onTargetErased)),
+                MemoryModuleType.ATTACK_TARGET);
+    }
+
+    // needed for villagers, as they only update their schedule via non-core tasks
+    private static <E extends Mob> void onTargetErased(E attacker, LivingEntity target) {
+        if(attacker.getBrain().getSchedule() != Schedule.EMPTY){
+            attacker.getBrain().useDefaultActivity();
+        }
     }
 
     public static <E extends Mob> Brain<E> getTypedBrain(E mob) {

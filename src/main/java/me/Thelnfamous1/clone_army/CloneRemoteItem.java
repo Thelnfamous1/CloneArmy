@@ -2,6 +2,7 @@ package me.Thelnfamous1.clone_army;
 
 import com.marwinekk.been.BeenMod;
 import me.Thelnfamous1.clone_army.duck.Summonable;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -132,6 +133,6 @@ public class CloneRemoteItem extends Item {
     @Override
     public void appendHoverText(ItemStack pStack, @org.jetbrains.annotations.Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
         super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
-        getType(pStack).ifPresent(et -> pTooltipComponents.add(Component.translatable(REMOTE_ENTITY_TYPE_KEY, Component.translatable(et.getDescriptionId()))));
+        getType(pStack).ifPresent(et -> pTooltipComponents.add(Component.translatable(REMOTE_ENTITY_TYPE_KEY, Component.translatable(et.getDescriptionId())).withStyle(ChatFormatting.GRAY)));
     }
 }
