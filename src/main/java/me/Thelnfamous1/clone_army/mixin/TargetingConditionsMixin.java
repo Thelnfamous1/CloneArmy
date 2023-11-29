@@ -22,23 +22,7 @@ public class TargetingConditionsMixin {
         if(cir.getReturnValue() && pAttacker instanceof Mob mobAttacker){
             if(!this.isCombat) return;
 
-
-            if(CommandableCombat.isAlwaysPassive(mobAttacker.getType())){
-                cir.setReturnValue(false);
-                return;
-            }
-
-            if(!CommandableCombat.isAllowedToAttack(mobAttacker, pTarget, true)){
-                cir.setReturnValue(false);
-                return;
-            }
-
-            if (!Summonable.cast(mobAttacker).canSummonableAttack(pTarget)) {
-                cir.setReturnValue(false);
-                return;
-            }
-
-            if (Summonable.cast(mobAttacker).isSummonableAlliedTo(pTarget).orElse(false)) {
+            if(CommandableCombat.isTargetInvalid(mobAttacker, pTarget) || Summonable.isTargetInvalid(mobAttacker, pTarget)){
                 cir.setReturnValue(false);
             }
         }

@@ -16,9 +16,10 @@ import net.minecraft.world.entity.schedule.Schedule;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiPredicate;
 
 public class BrainHelper {
-    public static <E extends Mob> void addMeleeAi(E mob, int pPriorityStart) {
+    public static <E extends Mob> void addMeleeAi(E mob, int pPriorityStart, BiPredicate<E, LivingEntity> stopAttackingWhen) {
         Brain<E> typedBrain = getTypedBrain(mob);
         typedBrain.getMemories().putIfAbsent(MemoryModuleType.ATTACK_TARGET, Optional.empty());
         typedBrain.getMemories().putIfAbsent(MemoryModuleType.ATTACK_COOLING_DOWN, Optional.empty());
@@ -26,7 +27,7 @@ public class BrainHelper {
                 ImmutableList.of(
                         new SetWalkTargetFromAttackTargetIfTargetOutOfReach(1.0F),
                         new MeleeAttack(20),
-                        new StopAttackingIfTargetInvalid<>(BrainHelper::onTargetErased)),
+                        new StopAttackingIfTargetInvalid<>(new PredicateSecond<>(mob, stopAttackingWhen), BrainHelper::onTargetErased)),
                 MemoryModuleType.ATTACK_TARGET);
     }
 

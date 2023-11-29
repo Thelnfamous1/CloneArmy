@@ -11,12 +11,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class CommandableCombat {
     public static final Predicate<Mob> CAN_ATTACK = le -> !isAlwaysPassive(le.getType());
     public static final Function<Mob, Optional<? extends LivingEntity>> COMMANDED_TARGET_FINDER = CommandableCombat::findNearestValidAttackTarget;
+    public static final BiPredicate<Mob, LivingEntity> STOP_ATTACKING_WHEN = (attacker, target) -> !isNearestValidAttackTarget(attacker, target);
     private static final Map<EntityType<?>, Boolean> HOSTILITY_TOGGLES = new HashMap<>();
     private static final Map<EntityType<?>, UUID> PLAYER_TARGETS = new HashMap<>();
     private static final Map<EntityType<?>, EntityType<?>> MOB_COMBAT = new HashMap<>();
@@ -38,7 +40,8 @@ public class CommandableCombat {
     }
 
     public static boolean isAlwaysPassive(EntityType<?> type){
-        return getHostilityToggle(type).isPresent() && !getHostilityToggle(type).get();
+        Optional<Boolean> hostilityToggle = getHostilityToggle(type);
+        return hostilityToggle.isPresent() && !hostilityToggle.get();
     }
 
     public static Optional<UUID> getPlayerTarget(EntityType<?> attacker){
@@ -85,6 +88,10 @@ public class CommandableCombat {
                 .or(() -> isAlwaysHostile(m.getType()) ? nearestVisibleLivingEntities.findClosest(le -> true) : Optional.empty());
     }
 
+    public static boolean isNearestValidAttackTarget(Mob mob, LivingEntity pTarget) {
+        return findNearestValidAttackTarget(mob).filter((nvat) -> nvat == pTarget).isPresent();
+    }
+
     public static boolean isAllowedToAttack(Entity attacker, Entity target, boolean defaultOutcome){
         return isCommandedAttackTarget(attacker, target).orElse(defaultOutcome);
     }
@@ -98,6 +105,12 @@ public class CommandableCombat {
                 .map(uuid -> attacker.level.getPlayerByUUID(uuid) == target)
                 .or(() -> getMobCombat(attacker.getType())
                         .map(et -> target.getType() == et));
+    }
+
+    public static boolean isTargetInvalid(Mob attacker, LivingEntity target){
+        if(CommandableCombat.isAlwaysPassive(attacker.getType())){
+            return true;
+        } else return !CommandableCombat.isAllowedToAttack(attacker, target, true);
     }
 
 }

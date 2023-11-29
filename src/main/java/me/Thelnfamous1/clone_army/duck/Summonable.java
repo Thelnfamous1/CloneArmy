@@ -88,4 +88,10 @@ public interface Summonable {
 
         return Optional.empty();
     }
+
+    static boolean isTargetInvalid(Mob attacker, LivingEntity target){
+        if (!Summonable.cast(attacker).canSummonableAttack(target)) {
+            return true;
+        } else return Summonable.cast(attacker).isSummonableAlliedTo(target).orElse(false);
+    }
 }

@@ -124,16 +124,32 @@ public class CloneArmy {
                     BrainHelper.addBehavior(availableBehaviorsByPriority, 0, Activity.CORE, new StartAttacking<>(CommandableCombat.CAN_ATTACK, CommandableCombat.COMMANDED_TARGET_FINDER));
                 }
                 if(!BrainHelper.hasActivity(activityRequirements, Activity.FIGHT)) {
-                    BrainHelper.addMeleeAi(mob, 0);
+                    BrainHelper.addMeleeAi(mob, 0, CommandableCombat.STOP_ATTACKING_WHEN);
                 }
             } else{
                 if(mob instanceof PathfinderMob pf && mob.goalSelector.getAvailableGoals().stream().map(WrappedGoal::getGoal).noneMatch(goal -> goal instanceof MeleeAttackGoal)){
                     mob.goalSelector.addGoal(4, new MeleeAttackGoal(pf, 1.0D, true));
                 }
                 mob.targetSelector.addGoal(0, new NearestAttackableTargetGoal<>(mob, LivingEntity.class, true, target ->
-                        CommandableCombat.isAllowedToAttack(mob, target, false)));
+                        CommandableCombat.isAllowedToAttack(mob, target, false)){
+                    @Override
+                    public boolean canContinueToUse() {
+                        LivingEntity target = this.mob.getTarget();
+                        if (target == null) {
+                            target = this.target;
+                        }
+                        if(target != null && !CommandableCombat.isAllowedToAttack(this.mob, target, false)) return false;
+                        return super.canContinueToUse();
+                    }
+                });
                 mob.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(mob, LivingEntity.class, true, target ->
-                        CommandableCombat.isAlwaysHostile(mob.getType())));
+                        CommandableCombat.isAlwaysHostile(mob.getType())){
+                    @Override
+                    public boolean canContinueToUse() {
+                        if(!CommandableCombat.isAlwaysHostile(this.mob.getType())) return false;
+                        return super.canContinueToUse();
+                    }
+                });
             }
         }
     }

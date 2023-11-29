@@ -9,6 +9,7 @@
     "MobMixin",
     "StartAttackingMixin",
     "StopAttackingIfTargetInvalidMixin",
+    "TargetGoalMixin",
     "TargetingConditionsMixin"
   ],
   "client": [],
